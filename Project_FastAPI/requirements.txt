@@ -1,0 +1,38 @@
+# FastAPI - современный веб-фреймворк для создания API
+fastapi==0.104.1
+
+# Uvicorn - ASGI сервер для запуска FastAPI приложения
+uvicorn[standard]==0.24.0
+
+# SQLAlchemy - ORM для работы с базами данных
+sqlalchemy==2.0.23
+
+# Alembic - инструмент для миграций базы данных
+alembic==1.12.1
+
+# Pydantic - валидация данных и сериализация
+pydantic==2.5.0
+
+# psycopg2-binary - драйвер для PostgreSQL (если используете)
+psycopg2-binary==2.9.9
+
+# asyncpg - асинхронный драйвер для PostgreSQL
+asyncpg==0.29.0
+
+# python-multipart - для работы с формами и файлами
+python-multipart==0.0.6
+
+# python-jose - для работы с JWT токенами
+python-jose[cryptography]==3.3.0
+
+# passlib - для хеширования паролей
+passlib[bcrypt]==1.7.4
+
+# python-dotenv - для загрузки переменных окружения
+python-dotenv==1.0.0
+
+# pytest - для тестирования
+pytest==7.4.3
+
+# httpx - для тестирования FastAPI приложений
+httpx==0.25.2
