@@ -13,3 +13,84 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Gender {
+  MALE
+  FEMALE
+  TIEBANAT
+}
+
+enum Role {
+  ADMIN
+  USER
+  MODERATOR
+}
+
+// NextAuth models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String   @db.Uuid
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// User model updated for NextAuth
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String    @db.VarChar(64)
+  email         String    @unique @db.VarChar(128)
+
+  password      String?   @db.VarChar(255)
+  emailVerified DateTime?
+  image         String?
+  gender        Gender    @default(MALE)
+  description   String?
+  is_premium    Boolean   @default(false)
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // Existing relations
+  first_user  LovedCouples[] @relation("FirstUser")
+  second_user LovedCouples[] @relation("SecondUser")
+
+  @@map("users")
+}
+
+model LovedCouples {
+  couple_id    String @id @default(uuid()) @db.Uuid
+  first        User   @relation("FirstUser", fields: [user_one_id], references: [id])
+  second       User   @relation("SecondUser", fields: [user_two_id], references: [id])
+
+  user_one_id String @db.Uuid
+  user_two_id String @db.Uuid
+}
