@@ -1,102 +1,180 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isVisible, setIsVisible] = useState(false);
+  const [currentFeature, setCurrentFeature] = useState(0);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Анимация появления элементов при загрузке страницы
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  // Автоматическая смена особенностей сервиса
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentFeature((prev) => (prev + 1) % 3);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const features = [
+    'Найди свою вторую половинку',
+    'Безопасные знакомства онлайн',
+    'Умный алгоритм подбора'
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-500 via-purple-600 to-blue-600">
+      {/* Header */}
+      <header className="relative z-10 px-6 py-4">
+        <nav className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+              <span className="text-purple-600 font-bold text-lg">♥</span>
+            </div>
+            <span className="text-white font-bold text-xl">LoveMatch</span>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-6">
+            <Link href="/about" className="text-white hover:text-pink-200 transition-colors">
+              О нас
+            </Link>
+            <Link href="/how-it-works" className="text-white hover:text-pink-200 transition-colors">
+              Как это работает
+            </Link>
+            <Link href="/login" className="bg-white text-purple-600 px-6 py-2 rounded-full font-semibold hover:bg-pink-100 transition-colors">
+              Войти
+            </Link>
+          </div>
+        </nav>
+      </header>
+
+      {/* Hero Section */}
+      <main className="relative px-6 py-20">
+        <div className="max-w-7xl mx-auto text-center">
+          {/* Animated feature text */}
+          <div className="mb-8 h-16 flex items-center justify-center">
+            <h2 className={`text-2xl md:text-4xl text-white font-light transition-all duration-500 ${
+              isVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'
+            }`}>
+              {features[currentFeature]}
+            </h2>
+          </div>
+
+          {/* Main heading */}
+          <h1 className={`text-5xl md:text-7xl font-bold text-white mb-8 transition-all duration-700 delay-300 ${
+            isVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
+          }`}>
+            Найди любовь
+            <br />
+            <span className="bg-gradient-to-r from-pink-300 to-yellow-300 bg-clip-text text-transparent">
+              своей жизни
+            </span>
+          </h1>
+
+          {/* Description */}
+          <p className={`text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto transition-all duration-700 delay-500 ${
+            isVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
+          }`}>
+            Присоединяйся к тысячам счастливых пар, которые нашли друг друга благодаря нашему сервису
+          </p>
+
+          {/* CTA Buttons */}
+          <div className={`flex flex-col sm:flex-row gap-4 justify-center items-center transition-all duration-700 delay-700 ${
+            isVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
+          }`}>
+            <Link 
+              href="/register" 
+              className="group bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:from-pink-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-pink-500/25"
+            >
+              Начать поиск
+              <span className="ml-2 group-hover:translate-x-1 transition-transform duration-300">→</span>
+            </Link>
+            
+            <Link 
+              href="/how-it-works" 
+              className="bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/30 transition-all duration-300 border border-white/30"
+            >
+              Узнать больше
+            </Link>
+          </div>
         </div>
+
+        {/* Floating elements for visual appeal */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-pink-400/20 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-32 h-32 bg-purple-400/20 rounded-full blur-xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-blue-400/20 rounded-full blur-xl animate-pulse delay-2000"></div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Features Section */}
+      <section className="relative px-6 py-20 bg-white/10 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-16">
+            Почему выбирают нас?
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: '🔒',
+                title: 'Безопасность',
+                description: 'Все профили проверяются, ваши данные защищены'
+              },
+              {
+                icon: '🎯',
+                title: 'Умный подбор',
+                description: 'AI алгоритм находит идеальные совпадения'
+              },
+              {
+                icon: '💝',
+                title: 'Настоящие чувства',
+                description: 'Фокус на серьезных отношениях, а не на случайных знакомствах'
+              }
+            ].map((feature, index) => (
+              <div 
+                key={index}
+                className={`text-center p-8 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105 ${
+                  isVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'
+                }`}
+                style={{ transitionDelay: `${800 + index * 200}ms` }}
+              >
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                <p className="text-white/80">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="px-6 py-12 bg-black/20 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="flex items-center justify-center space-x-2 mb-6">
+            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+              <span className="text-purple-600 font-bold text-sm">♥</span>
+            </div>
+            <span className="text-white font-bold text-lg">LoveMatch</span>
+          </div>
+          <p className="text-white/60 mb-4">
+            © 2024 LoveMatch. Все права защищены.
+          </p>
+          <div className="flex justify-center space-x-6 text-sm">
+            <Link href="/privacy" className="text-white/60 hover:text-white transition-colors">
+              Конфиденциальность
+            </Link>
+            <Link href="/terms" className="text-white/60 hover:text-white transition-colors">
+              Условия использования
+            </Link>
+            <Link href="/support" className="text-white/60 hover:text-white transition-colors">
+              Поддержка
+            </Link>
+          </div>
+        </div>
       </footer>
     </div>
   );
