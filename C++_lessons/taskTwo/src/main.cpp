@@ -17,7 +17,7 @@ int validate() {
     return number;
 }
 
-void transpose(string** arr, int ]x, int y) {
+void transpose(string** arr, int x, int y) {
     cout << "\nТранспонированная матрица:" << endl;
     for (int i = 0; i < y; i++) {
         for (int j = 0; j < x; j++) {

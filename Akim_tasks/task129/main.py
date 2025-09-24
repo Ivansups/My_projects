@@ -41,13 +41,19 @@ def write_result(filename, result):
         file.write(str(result))
 
 def main():
+    import os
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    input_file = os.path.join(script_dir, 'input.txt')
+    output_file = os.path.join(script_dir, 'output.txt')
+    
     try:
-        matrix = read_matrix('input.txt')
+        matrix = read_matrix(input_file)
         det = determinant(matrix)
-        write_result('output.txt', det)
+        write_result(output_file, det)
         print(f"Определитель матрицы: {det}")
     except FileNotFoundError:
-        print("Файл input.txt не найден!")
+        print(f"Файл {input_file} не найден!")
     except Exception as e:
         print(f"Ошибка: {e}")
 
