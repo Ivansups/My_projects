@@ -1,47 +1,63 @@
+#include <exception>
 #include <fstream>
 #include <iostream> 
-#include <unordered_map>
 #include <string>
-#include <algorithm>
 using namespace std;
+
 int main() {
-    unordered_map<std::string, int> wordCount;
-    ifstream file;
+    const int MAX_WORDS = 1000;
+    string words[MAX_WORDS];
+    int counts[MAX_WORDS];
+    int wordCount = 0;
+    
+    ifstream intputFile;
     ofstream outFile;
     string word;
 
     try {
-        file = ifstream("f1.txt");
-        if (!file.is_open()) {
-            throw exception();
+        intputFile.open("f1.txt");
+        if (!intputFile.is_open()) {
+            cout << "Не удалось открыть файл" << endl;
+            return 1;
         }
     } catch (exception e) {
-        cout << "Не удалось открыть файл" << endl;
-        return 1;
+        throw e;
     }
 
-    while (file >> word) {
-            transform(word.begin(), word.end(), word.begin(), ::tolower);
-            if (wordCount.find(word) != wordCount.end()) {
-                wordCount[word] += 1;
-            } else {
-                wordCount[word] = 1;
+    while (intputFile >> word && wordCount < MAX_WORDS) {
+        for (int i = 0; i < word.length(); i++) {
+            word[i] = tolower(word[i]);
+        }
+        
+        bool found = false;
+        for (int i = 0; i < wordCount; i++) {
+            if (words[i] == word) {
+                counts[i]++;
+                found = true;
+                break;
             }
         }
-    file.close();
+        
+        if (!found) {
+            words[wordCount] = word;
+            counts[wordCount] = 1;
+            wordCount++;
+        }
+    }
+    intputFile.close();
 
-    try {
-        outFile = ofstream("f2.txt");
+    try{
+        outFile.open("f2.txt");
         if (!outFile.is_open()) {
-            throw exception();
+            cout << "Не удалось открыть файл для записи" << endl;
+            return 1;
         }
     } catch (exception e) {
-        cout << "Не удалось открыть файл" << endl;
-        return 1;
+        throw e;
     }
 
-    for (const auto& pair : wordCount) {
-        outFile << pair.first << ": " << pair.second << std::endl;
+    for (int i = 0; i < wordCount; i++) {
+        outFile << words[i] << ": " << counts[i] << endl;
     }
     outFile.close();
 
