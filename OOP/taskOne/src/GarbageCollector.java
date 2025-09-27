@@ -1,71 +1,37 @@
-import java.util.*;
+import java.util.Collection;
 
-public abstract class GarbageCollector {
-    protected final Heap heap;
-    protected final List<GCObject> roots;
+/**
+ * Базовый интерфейс для всех алгоритмов сборки мусора
+ */
+public interface GarbageCollector {
     
-    public GarbageCollector(Heap heap) {
-        this.heap = heap;
-        this.roots = new ArrayList<>();
-    }
+    /**
+     * Добавляет корневой объект (объект, достижимый извне)
+     * @param root корневой объект
+     */
+    void addRoot(GCObject root);
     
-    public void addRoot(GCObject root) {
-        if (root != null && !roots.contains(root)) {
-            roots.add(root);
-        }
-    }
+    /**
+     * Удаляет корневой объект
+     * @param root корневой объект для удаления
+     */
+    void removeRoot(GCObject root);
     
-    public void removeRoot(GCObject root) {
-        roots.remove(root);
-    }
+    /**
+     * Запускает сборку мусора
+     * @return коллекция собранных (удаленных) объектов
+     */
+    Collection<GCObject> collect();
     
-    public List<GCObject> getRoots() {
-        return new ArrayList<>(roots);
-    }
+    /**
+     * Возвращает список корневых объектов
+     * @return список корневых объектов
+     */
+    Collection<GCObject> getRoots();
     
-    public abstract Collection<GCObject> collect();
-    
-    protected void markReachable() {
-        for (GCObject obj : heap.getAllObjects()) {
-            obj.unmark();
-        }
-        
-        for (GCObject root : roots) {
-            markObject(root);
-        }
-    }
-    
-    protected void markObject(GCObject obj) {
-        if (obj == null || obj.isMarked()) {
-            return;
-        }
-        
-        obj.mark();
-        
-        for (GCObject ref : obj.getReferences()) {
-            markObject(ref);
-        }
-    }
-    
-    protected List<GCObject> getUnreachableObjects() {
-        List<GCObject> unreachable = new ArrayList<>();
-        
-        for (GCObject obj : heap.getAllObjects()) {
-            if (!obj.isMarked()) {
-                unreachable.add(obj);
-            }
-        }
-        
-        return unreachable;
-    }
-    
-    protected void logHeapState(String phase) {
-        int totalObjects = heap.getAllObjects().size();
-        int unreachableObjects = getUnreachableObjects().size();
-        int reachableObjects = totalObjects - unreachableObjects;
-        
-        System.out.printf("📊 %s: %d объектов (✅ %d нужных, ❌ %d мусора)%n", 
-                         phase, totalObjects, reachableObjects, unreachableObjects);
-    }
+    /**
+     * Возвращает имя алгоритма сборки мусора
+     * @return имя алгоритма
+     */
+    String getAlgorithmName();
 }
-

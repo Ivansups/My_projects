@@ -1,65 +1,75 @@
 import java.util.*;
 
-public class MarkAndSweepGC extends GarbageCollector {
-    
+public class MarkAndSweepGC implements GarbageCollector {
+    private final Heap heap;
+    private final List<GCObject> roots;
+
     public MarkAndSweepGC(Heap heap) {
-        super(heap);
+        this.heap = heap;
+        this.roots = new ArrayList<>();
     }
-    
+
+    @Override
+    public void addRoot(GCObject root) {
+        if (root != null && !roots.contains(root)) {
+            roots.add(root);
+        }
+    }
+
+    @Override
+    public void removeRoot(GCObject root) {
+        roots.remove(root);
+    }
+
     @Override
     public Collection<GCObject> collect() {
-        System.out.println("\n🧹 ЗАПУСК СБОРЩИКА МУСОРА MARK & SWEEP");
-        System.out.println("=====================================");
+        long startTime = System.currentTimeMillis();
         
-        System.out.println("🔍 Этап 1: ПОИСК ДОСТИЖИМЫХ ОБЪЕКТОВ");
-        logHeapState("До поиска");
-        markReachable();
-        logHeapState("После поиска");
+        // 1. Mark phase
+        for (GCObject obj : heap.getObjectsCopy()) {
+            obj.unmark();
+        }
         
-        List<GCObject> unreachableObjects = getUnreachableObjects();
+        for (GCObject root : roots) {
+            markObject(root);
+        }
+
+        // 2. Sweep phase
+        List<GCObject> unreachableObjects = new ArrayList<>();
+        Iterator<GCObject> iterator = heap.getAllObjects().iterator();
         
-        System.out.println("\n🗑️ Этап 2: УДАЛЕНИЕ МУСОРА");
-        if (unreachableObjects.isEmpty()) {
-            System.out.println("✅ Мусора не найдено - все объекты нужны!");
-        } else {
-            System.out.println("Найдены ненужные объекты:");
-            for (GCObject obj : unreachableObjects) {
-                System.out.println("  ❌ Удаляем: " + obj.getName());
+        while (iterator.hasNext()) {
+            GCObject obj = iterator.next();
+            if (!obj.isMarked()) {
+                unreachableObjects.add(obj);
+                iterator.remove();
                 heap.removeObject(obj);
             }
         }
         
-        logHeapState("После очистки");
-        
-        int freedBytes = unreachableObjects.stream().mapToInt(GCObject::getSize).sum();
-        System.out.printf("\n📊 РЕЗУЛЬТАТ: Собрано %d объектов, освобождено %d байт%n", 
-                         unreachableObjects.size(), freedBytes);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Mark & Sweep GC выполнен за " + (endTime - startTime) + " мс");
         
         return unreachableObjects;
     }
-    
-    public void demonstrateMarkAndSweep() {
-        System.out.println("\n📋 СОСТОЯНИЕ ДО СБОРКИ МУСОРА:");
-        System.out.println("================================");
-        for (GCObject obj : heap.getAllObjects()) {
-            System.out.println("  " + obj.getName() + " (размер: " + obj.getSize() + " байт)");
+
+    private void markObject(GCObject obj) {
+        if (obj == null || obj.isMarked()) {
+            return;
         }
-        
-        Collection<GCObject> collected = collect();
-        
-        System.out.println("\n✅ СОСТОЯНИЕ ПОСЛЕ СБОРКИ МУСОРА:");
-        System.out.println("=================================");
-        for (GCObject obj : heap.getAllObjects()) {
-            System.out.println("  " + obj.getName() + " (размер: " + obj.getSize() + " байт)");
-        }
-        
-        if (!collected.isEmpty()) {
-            System.out.println("\n🗑️ УДАЛЕННЫЕ ОБЪЕКТЫ:");
-            System.out.println("=====================");
-            for (GCObject obj : collected) {
-                System.out.println("  " + obj.getName() + " (размер: " + obj.getSize() + " байт)");
-            }
+        obj.mark();
+        for (GCObject ref : obj.getReferences()) {
+            markObject(ref);
         }
     }
-}
 
+    @Override
+    public Collection<GCObject> getRoots() {
+        return new ArrayList<>(roots);
+    }
+
+    @Override
+    public String getAlgorithmName() {
+        return "Mark & Sweep";
+    }
+}
