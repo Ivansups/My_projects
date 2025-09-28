@@ -32,19 +32,21 @@ taskOne/
 
 ## Запуск
 
-1. **Сборка проекта:**
+1. **Интерактивный режим:**
    ```bash
-   ./build.sh
+   ./build.sh              # Сборка + запуск SimpleGC (нажмите Ctrl+C для остановки)
    ```
 
-2. **Основная демонстрация:**
+2. **Демонстрация (10 секунд):**
    ```bash
-   java -cp target/classes App
+   ./demo.sh               # Сборка + демонстрация SimpleGC на 10 секунд
    ```
 
-3. **Простой генератор объектов:**
+3. **Ручной запуск:**
    ```bash
-   java -cp target/classes SimpleGC
+   java -cp target/classes App           # Основная демонстрация
+   java -cp target/classes SimpleGC       # Простой генератор
+   java -cp target/classes AggressiveGC  # Агрессивный генератор
    ```
 
 ## Как работает

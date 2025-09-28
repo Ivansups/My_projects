@@ -1,7 +1,7 @@
 import java.util.*;
 import java.util.concurrent.*;
 
-public class SimpleGC {
+public class AggressiveGC {
     
     private final List<GCObject> heap;
     private final List<GCObject> roots;
@@ -11,7 +11,7 @@ public class SimpleGC {
     private final ExecutorService executor;
     private volatile boolean running;
     
-    public SimpleGC(int maxSize) {
+    public AggressiveGC(int maxSize) {
         this.maxSize = maxSize;
         this.heap = Collections.synchronizedList(new ArrayList<>());
         this.roots = Collections.synchronizedList(new ArrayList<>());
@@ -25,14 +25,14 @@ public class SimpleGC {
         if (running) return;
         
         running = true;
-        System.out.println("🚀 Генератор запущен (куча: " + maxSize + " байт)");
+        System.out.println("🚀 АГРЕССИВНЫЙ ГЕНЕРАТОР запущен (куча: " + maxSize + " байт)");
         
         // Поток создания объектов
         executor.submit(() -> {
             while (running) {
                 try {
                     createObjects();
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     break;
                 }
@@ -43,7 +43,7 @@ public class SimpleGC {
         executor.submit(() -> {
             while (running) {
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(3000);
                     if (running) {
                         cleanup();
                     }
@@ -55,23 +55,17 @@ public class SimpleGC {
     }
     
     public void stop() {
-        if (!running) return; // Уже остановлен
-        
         running = false;
         executor.shutdown();
         
         try {
-            executor.awaitTermination(1, TimeUnit.SECONDS);
+            executor.awaitTermination(2, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             executor.shutdownNow();
         }
         
         System.out.println("\n🛑 Генератор остановлен");
         printStats();
-    }
-    
-    public boolean isRunning() {
-        return running;
     }
     
     private void createObjects() {
@@ -111,24 +105,24 @@ public class SimpleGC {
     
     private void cleanup() {
         synchronized (heap) {
-            System.out.println("\n🧹 Очистка...");
+            System.out.println("\n🧹 АГРЕССИВНАЯ ОЧИСТКА...");
             
-            // Более агрессивное удаление корней
-            if (!roots.isEmpty() && random.nextDouble() < 0.6) {
+            // Очень агрессивное удаление корней (80%)
+            if (!roots.isEmpty() && random.nextDouble() < 0.8) {
                 GCObject root = roots.remove(random.nextInt(roots.size()));
                 heap.remove(root);
                 currentSize -= root.getSize();
                 System.out.println("🗑️ Удален корень: " + root.getName());
             }
             
-            // Принудительное освобождение при заполнении кучи на 90%+
-            if (currentSize > maxSize * 0.9 && !roots.isEmpty()) {
-                int toRemove = Math.min(3, roots.size()); // Удаляем до 3 корней
+            // Принудительное освобождение при заполнении кучи на 80%+
+            if (currentSize > maxSize * 0.8 && !roots.isEmpty()) {
+                int toRemove = Math.min(5, roots.size()); // Удаляем до 5 корней
                 for (int i = 0; i < toRemove; i++) {
                     GCObject root = roots.remove(random.nextInt(roots.size()));
                     heap.remove(root);
                     currentSize -= root.getSize();
-                    System.out.println("🔥 Принудительно удален: " + root.getName());
+                    System.out.println("🔥 ПРИНУДИТЕЛЬНО удален: " + root.getName());
                 }
             }
             
@@ -219,24 +213,22 @@ public class SimpleGC {
     }
     
     public static void main(String[] args) {
-        System.out.println("🏭 ПРОСТОЙ ГЕНЕРАТОР ОБЪЕКТОВ");
-        System.out.println("==============================");
-        System.out.println("Создание и очистка объектов в рантайме");
+        System.out.println("🔥 АГРЕССИВНЫЙ ГЕНЕРАТОР ОБЪЕКТОВ");
+        System.out.println("==================================");
+        System.out.println("Создание и АГРЕССИВНАЯ очистка объектов");
         System.out.println();
         
-        SimpleGC gc = new SimpleGC(1000); // Куча 1000 байт
+        AggressiveGC gc = new AggressiveGC(1000); // Куча 1000 байт
         gc.start();
         
-        // Простой способ - ждем ввода с клавиатуры
         System.out.println("Нажмите Enter для остановки...");
         
         try {
             System.in.read();
         } catch (Exception e) {
-            System.out.println("Ошибка ввода: " + e.getMessage());
+            System.out.println("Ошибка: " + e.getMessage());
         }
         
         gc.stop();
-        System.out.println("🏁 Программа завершена");
     }
 }
